@@ -48,6 +48,15 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func dotButtonPressed(_ sender: UIButton) {
+        currConsoleVal = ConsoleValue.text!
+        if (currConsoleVal == "0"){
+            ConsoleValue.text! = "."
+        } else {
+            ConsoleValue.text! = currConsoleVal + "."
+        }
+    }
+    
     @IBAction func eraseValueButtonPressed(_ sender: UIButton) {
         ConsoleValue.text! = "0"
         previousValue = ""
@@ -91,6 +100,7 @@ class ViewController: UIViewController {
             operationActive = true
         }
     }
+    
     @IBAction func equalButtonPressed(_ sender: UIButton) {
         if (operationActive){
             previousValue = currentValue
