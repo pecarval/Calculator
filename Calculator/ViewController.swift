@@ -19,10 +19,10 @@ class ViewController: UIViewController {
     var previousValue : String = ""
     var currentValue : String = ""
 
-    var tempResult : Float = 0
+    var tempResult : Double = 0
     var multiplier : String = ""
     
-    var currentConsoleValue : String = ""
+    var currConsoleVal : String = ""
     var buttonPressedValue : String = ""
     var inputFinished : Bool = false
     
@@ -33,17 +33,17 @@ class ViewController: UIViewController {
 
     @IBAction func buttonPressed(_ sender: UIButton) {
         
-        currentConsoleValue = ConsoleValue.text!
+        currConsoleVal = ConsoleValue.text!
         buttonPressedValue = (sender.titleLabel?.text)!
         
         if (inputFinished) {
             ConsoleValue.text! = (sender.titleLabel?.text)!
             inputFinished = false
         } else {
-            if (currentConsoleValue == "0"){
+            if (currConsoleVal == "0"){
                 ConsoleValue.text! = (sender.titleLabel?.text)!
             } else {
-                ConsoleValue.text! = currentConsoleValue + buttonPressedValue
+                ConsoleValue.text! = currConsoleVal + buttonPressedValue
             }
         }
     }
@@ -55,16 +55,34 @@ class ViewController: UIViewController {
         operationActive = false
     }
     
+    @IBAction func plusMinusButtonPressed(_ sender: UIButton) {
+        let current = (ConsoleValue.text! as NSString).doubleValue
+        currConsoleVal = ConsoleValue.text!
+        if  (currConsoleVal as NSString).doubleValue < 0 {
+            ConsoleValue.text! = "\(abs(current))"
+            currentValue = ConsoleValue.text!
+        } else {
+            ConsoleValue.text! = "-"+ConsoleValue.text!
+            currentValue = ConsoleValue.text!
+        }
+    }
+    
+    @IBAction func percentageButtonPressed(_ sender: UIButton) {
+        var current = (ConsoleValue.text! as NSString).doubleValue
+        current = current * 0.01
+        ConsoleValue.text! = "\(current)"
+    }
+    
     @IBAction func operationButtonPressed(_ sender: UIButton) {
         
         if (operationActive) {
             inputFinished = true
             previousValue = currentValue
             currentValue = ConsoleValue.text!
-            executeOperation(operation: operation, value1: (previousValue as NSString).floatValue, value2: (currentValue as NSString).floatValue)
+            executeOperation(operation: operation, value1: (previousValue as NSString).doubleValue, value2: (currentValue as NSString).doubleValue)
             previousValue = currentValue
             currentValue = "\(tempResult)"
-            ConsoleValue.text! = "\(tempResult)"
+            ConsoleValue.text! = "\(tempResult.stringWithoutZeroFraction)"
             operation = (sender.titleLabel?.text)!
         } else {
             inputFinished = true
@@ -77,8 +95,8 @@ class ViewController: UIViewController {
         if (operationActive){
             previousValue = currentValue
             currentValue = ConsoleValue.text!
-            executeOperation(operation: operation, value1: (previousValue as NSString).floatValue, value2: (currentValue as NSString).floatValue)
-            ConsoleValue.text! = "\(tempResult)"
+            executeOperation(operation: operation, value1: (previousValue as NSString).doubleValue, value2: (currentValue as NSString).doubleValue)
+            ConsoleValue.text! = "\(tempResult.stringWithoutZeroFraction)"
             operationActive = false
             previousValue = currentValue
             currentValue = "\(tempResult)"
@@ -88,12 +106,12 @@ class ViewController: UIViewController {
             previousValue = multiplier
             currentValue = ConsoleValue.text!
             
-            executeOperation(operation: operation, value1: (currentValue as NSString).floatValue, value2: (multiplier as NSString).floatValue)
-            ConsoleValue.text! = "\(tempResult)"
+            executeOperation(operation: operation, value1: (currentValue as NSString).doubleValue, value2: (multiplier as NSString).doubleValue)
+            ConsoleValue.text! = "\(tempResult.stringWithoutZeroFraction)"
         }
     }
     
-    func executeOperation(operation : String, value1 : Float, value2 : Float){
+    func executeOperation(operation : String, value1 : Double, value2 : Double){
         
         print(operation + ":  \(value1) ; \(value2)")
         
@@ -110,5 +128,11 @@ class ViewController: UIViewController {
             print("Error")
         }
         print(tempResult)
+    }
+}
+
+extension Double {
+    var stringWithoutZeroFraction: String {
+        return truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", self) : String(self)
     }
 }
