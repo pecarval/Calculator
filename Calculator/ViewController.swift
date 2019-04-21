@@ -23,25 +23,28 @@ class ViewController: UIViewController {
     var multiplier : String = ""
     
     var currConsoleVal : String = ""
-    var buttonPressedValue : String = ""
     var inputFinished : Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         ConsoleValue.text! = "0"
     }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
 
     @IBAction func buttonPressed(_ sender: UIButton) {
         
         currConsoleVal = ConsoleValue.text!
-        buttonPressedValue = (sender.titleLabel?.text)!
+        let buttonPressedValue = (sender.titleLabel?.text)!
         
         if (inputFinished) {
             ConsoleValue.text! = (sender.titleLabel?.text)!
             inputFinished = false
         } else {
             if (currConsoleVal == "0"){
-                ConsoleValue.text! = (sender.titleLabel?.text)!
+                ConsoleValue.text! = buttonPressedValue
             } else {
                 ConsoleValue.text! = currConsoleVal + buttonPressedValue
             }
@@ -50,10 +53,12 @@ class ViewController: UIViewController {
     
     @IBAction func dotButtonPressed(_ sender: UIButton) {
         currConsoleVal = ConsoleValue.text!
-        if (currConsoleVal == "0"){
-            ConsoleValue.text! = "."
+        if (inputFinished){
+            ConsoleValue.text! = "0."
         } else {
-            ConsoleValue.text! = currConsoleVal + "."
+            if !currConsoleVal.contains(".") {
+                ConsoleValue.text! = currConsoleVal + "."
+            }
         }
     }
     
@@ -66,13 +71,14 @@ class ViewController: UIViewController {
     
     @IBAction func plusMinusButtonPressed(_ sender: UIButton) {
         let current = (ConsoleValue.text! as NSString).doubleValue
-        currConsoleVal = ConsoleValue.text!
-        if  (currConsoleVal as NSString).doubleValue < 0 {
+        if  current < 0 {
             ConsoleValue.text! = "\(abs(current))"
             currentValue = ConsoleValue.text!
-        } else {
+        } else if current > 0{
             ConsoleValue.text! = "-"+ConsoleValue.text!
             currentValue = ConsoleValue.text!
+        } else {
+            ConsoleValue.text! = "0"
         }
     }
     
@@ -85,52 +91,58 @@ class ViewController: UIViewController {
     @IBAction func operationButtonPressed(_ sender: UIButton) {
         
         if (operationActive) {
-            inputFinished = true
-            previousValue = currentValue
-            currentValue = ConsoleValue.text!
-            executeOperation(operation: operation, value1: (previousValue as NSString).doubleValue, value2: (currentValue as NSString).doubleValue)
-            previousValue = currentValue
-            currentValue = "\(tempResult)"
-            ConsoleValue.text! = "\(tempResult.stringWithoutZeroFraction)"
+            implementOperation()
             operation = (sender.titleLabel?.text)!
         } else {
             inputFinished = true
+            operationActive = true
+            previousValue = currentValue
             currentValue = ConsoleValue.text!
             operation = (sender.titleLabel?.text)!
-            operationActive = true
         }
     }
     
     @IBAction func equalButtonPressed(_ sender: UIButton) {
         if (operationActive){
-            previousValue = currentValue
-            currentValue = ConsoleValue.text!
-            executeOperation(operation: operation, value1: (previousValue as NSString).doubleValue, value2: (currentValue as NSString).doubleValue)
-            ConsoleValue.text! = "\(tempResult.stringWithoutZeroFraction)"
+            implementOperation()
             operationActive = false
-            previousValue = currentValue
-            currentValue = "\(tempResult)"
-            inputFinished = true
         } else {
             multiplier = previousValue
             previousValue = multiplier
             currentValue = ConsoleValue.text!
             
-            executeOperation(operation: operation, value1: (currentValue as NSString).doubleValue, value2: (multiplier as NSString).doubleValue)
-            ConsoleValue.text! = "\(tempResult.stringWithoutZeroFraction)"
+            executeOperation()
+            //ConsoleValue.text! = "\(tempResult.removeZerosFromEnd())"
+            //ConsoleValue.text! = "\(tempResult)"
+            ConsoleValue.text! = tempResult.formatNumbers()
         }
     }
     
-    func executeOperation(operation : String, value1 : Double, value2 : Double){
+    func implementOperation(){
+        inputFinished = true
+        previousValue = currentValue
+        currentValue = ConsoleValue.text!
+        executeOperation()
+        previousValue = currentValue
+        currentValue = "\(tempResult)"
+        
+        //ConsoleValue.text! = "\(tempResult.removeZerosFromEnd())"
+        //ConsoleValue.text! = "\(tempResult)"
+        ConsoleValue.text! = tempResult.formatNumbers()
+    }
+    
+    func executeOperation(){
+        
+        let value1 : Double = (previousValue as NSString).doubleValue
+        let value2 : Double = (currentValue as NSString).doubleValue
         
         print(operation + ":  \(value1) ; \(value2)")
-        
         switch operation {
         case "+":
             tempResult = value1 + value2
         case "-":
             tempResult = value1 - value2
-        case "X":
+        case "x":
             tempResult = value1 * value2
         case "/":
             tempResult = value1 / value2
@@ -142,7 +154,15 @@ class ViewController: UIViewController {
 }
 
 extension Double {
-    var stringWithoutZeroFraction: String {
-        return truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", self) : String(self)
+    func formatNumbers() -> String {
+        let numberFormat = NumberFormatter()
+        let number = NSNumber(value: self)
+        print("Pre-formatted number: \(number)")
+        numberFormat.usesSignificantDigits = true
+        //numberFormat.minimumFractionDigits = 0
+        numberFormat.maximumSignificantDigits = 6
+        let numberFormatted = String(numberFormat.string(from: number) ?? "")
+        print("Formatted number: " + numberFormatted)
+        return numberFormatted
     }
 }
