@@ -144,7 +144,7 @@ class ViewController: UIViewController {
             tempResult = value1 - value2
         case "x":
             tempResult = value1 * value2
-        case "/":
+        case "÷":
             tempResult = value1 / value2
         default:
             print("Error")
