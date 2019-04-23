@@ -43,11 +43,7 @@ class ViewController: UIViewController {
             ConsoleValue.text! = (sender.titleLabel?.text)!
             inputFinished = false
         } else {
-            if (currConsoleVal == "0"){
-                ConsoleValue.text! = buttonPressedValue
-            } else {
-                ConsoleValue.text! = currConsoleVal + buttonPressedValue
-            }
+            ConsoleValue.text! = (currConsoleVal == "0") ? buttonPressedValue : currConsoleVal + buttonPressedValue
         }
     }
     
@@ -112,9 +108,6 @@ class ViewController: UIViewController {
             currentValue = ConsoleValue.text!
             
             executeOperation()
-            //ConsoleValue.text! = "\(tempResult.removeZerosFromEnd())"
-            //ConsoleValue.text! = "\(tempResult)"
-            ConsoleValue.text! = tempResult.formatNumbers()
         }
     }
     
@@ -125,10 +118,6 @@ class ViewController: UIViewController {
         executeOperation()
         previousValue = currentValue
         currentValue = "\(tempResult)"
-        
-        //ConsoleValue.text! = "\(tempResult.removeZerosFromEnd())"
-        //ConsoleValue.text! = "\(tempResult)"
-        ConsoleValue.text! = tempResult.formatNumbers()
     }
     
     func executeOperation(){
@@ -150,6 +139,10 @@ class ViewController: UIViewController {
             print("Error")
         }
         print(tempResult)
+        
+        //ConsoleValue.text! = "\(tempResult.removeZerosFromEnd())"
+        //ConsoleValue.text! = "\(tempResult)"
+        ConsoleValue.text! = tempResult.formatNumbers()
     }
 }
 
